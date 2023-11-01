@@ -2,6 +2,9 @@
 // NamedImport  from = somelibrary
 // const { PrismaClient } = require("@prisma/client");
 // const { PrismaClient } = require("@prisma/client")
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
+
 import prisma  from "@/lip/prisma"
 
 // let prisma = new PrismaClient()
@@ -10,7 +13,8 @@ async function POST(request){
     const res = await request.json()
     console.log(res);
     // Destructuring and object
-    const {name,email,password,role} = res;
+    const {name,email,password,UserRole} = res;
+    const hash = bcrypt.hashSync(password, saltRounds);
 
     // 2.1
     try {
@@ -18,16 +22,16 @@ async function POST(request){
         // prisma.model.method
         const user = await prisma.user.create({
             data:{
-                    "name": "admin7",
-                    "email": "admin7@gmail.com",
-                    "password": "admin7@gmail.com",
-                    "UserRole": "ADMIN"
+                    "name": name,
+                    "email": email,
+                    "password": hash,
+                    "UserRole": UserRole
                  }
         })
-        return Response.json({mag:user})
+        return Response.json({ status:200,mag:user})
 
     } catch (error) {    
-        return Response.json({mag:"user"})
+        return Response.json({status:400, mag:"user"})
     }
     // 2.2
     // 2.3 Retuen Statment 
